@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书签广告投放顾问 AI</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #333; line-height: 1.6; }
+        h1 { color: #1a73e8; text-align: center; }
+        .container { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 2rem; }
+        label { display: block; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; }
+        textarea { width: 100%; box-sizing: border-box; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; min-height: 150px; }
+        input[type="text"] { width: 100%; box-sizing: border-box; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+        button { display: block; width: 100%; background-color: #1a73e8; color: white; border: none; padding: 1rem; font-size: 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 1.5rem; }
+        button:disabled { background-color: #9E9E9E; }
+        #response-area { margin-top: 2rem; padding: 1.5rem; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; }
+        .loading { color: #777; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>AI 书签广告投放顾问</h1>
+    <div class="container">
+        <form id="advisor-form">
+            <label for="books-info">1. 输入书籍信息 (每行一本书，格式：书名: 简介)</label>
+            <textarea id="books-info" placeholder="例如：
+三体: 一部关于外星文明入侵的硬科幻小说。
+活着: 讲述了一个人在中国历史变迁中经历苦难的故事。
+明朝那些事儿: 用通俗易懂的语言讲述明朝历史。" required></textarea>
+
+            <label for="target-audience">2. 输入你的书签广告目标人群</label>
+            <input type="text" id="target-audience" placeholder="例如：喜欢科幻、思考宇宙未来的年轻科技从业者" required>
+
+            <button id="submit-button" type="submit">获取投放建议</button>
+        </form>
+    </div>
+    
+    <div id="response-area">
+        <p>分析结果将显示在这里...</p>
+    </div>
+
+    <script>
+        const advisorForm = document.getElementById('advisor-form');
+        const booksInfoInput = document.getElementById('books-info');
+        const targetAudienceInput = document.getElementById('target-audience');
+        const responseArea = document.getElementById('response-area');
+        const submitButton = document.getElementById('submit-button');
+
+        advisorForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const booksInfo = booksInfoInput.value.trim();
+            const targetAudience = targetAudienceInput.value.trim();
+            
+            if (!booksInfo || !targetAudience) return;
+
+            submitButton.disabled = true;
+            submitButton.textContent = '分析中...';
+            responseArea.innerHTML = '<p class="loading">AI 顾问正在分析书籍和目标人群，请稍候...</p>';
+
+            try {
+                // 注意，我们调用的函数是 advisor
+                const response = await fetch('/.netlify/functions/advisor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ books: booksInfo, audience: targetAudience })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `服务器错误: ${response.status}`);
+                }
+
+                const data = await response.json();
+                responseArea.innerHTML = data.reply.replace(/\n/g, '<br>'); // 将换行符转为HTML换行
+
+            } catch (error) {
+                console.error('Error:', error);
+                responseArea.innerHTML = `<p style="color:red;"><strong>分析失败：</strong>${error.message}</p>`;
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = '获取投放建议';
+            }
+        });
+    </script>
+</body>
+</html>

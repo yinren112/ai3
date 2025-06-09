@@ -1,0 +1,4 @@
+# 这个文件告诉 Netlify 如何构建你的网站
+[build]
+  # 指定存放 Serverless Functions 的目录
+  functions = "netlify/functions"
