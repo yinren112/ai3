@@ -46,7 +46,7 @@ export async function handler(event) {
 
     // --- 3. 设置模型和API ---
     // 使用您指定的 2.5 Pro 预览版模型
-    const modelName = 'gemini-2.5-pro-preview-0506'; // <-- 已更正！这里之前误写为 1.5
+    const modelName = 'gemini-2.5-flash-preview-04-17'; // <-- 已更正！这里之前误写为 1.5
 
     const apiKey = process.env.GEMINI_API_KEY;
 
