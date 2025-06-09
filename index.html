@@ -3,39 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>书签广告投放顾问 AI</title>
+    <title>AI 书签广告投放顾问</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #333; line-height: 1.6; }
-        h1 { color: #1a73e8; text-align: center; }
-        .container { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 2rem; }
-        label { display: block; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; }
-        textarea { width: 100%; box-sizing: border-box; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; min-height: 150px; }
-        input[type="text"] { width: 100%; box-sizing: border-box; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
-        button { display: block; width: 100%; background-color: #1a73e8; color: white; border: none; padding: 1rem; font-size: 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 1.5rem; }
-        button:disabled { background-color: #9E9E9E; }
-        #response-area { margin-top: 2rem; padding: 1.5rem; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 8px; white-space: pre-wrap; word-wrap: break-word; }
-        .loading { color: #777; font-style: italic; }
+        :root {
+            --primary-gradient: linear-gradient(90deg, #4f46e5, #818cf8);
+            --background-color: #f7f8fc;
+            --card-background: #ffffff;
+            --text-color: #2d3748;
+            --subtle-text-color: #718096;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(100, 100, 111, 0.1);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background-color: var(--card-background);
+            border-radius: 16px;
+            box-shadow: 0 7px 25px 0 var(--shadow-color);
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--subtle-text-color);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            background-image: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        #response-area {
+            margin-top: 2.5rem;
+        }
+
+        /* ----- Loader Animation ----- */
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #e2e8f0;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            margin: 2rem auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ----- Results List Animation ----- */
+        #result-list {
+            list-style: none;
+            padding: 0;
+        }
+        .result-item {
+            background-color: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 5px solid #818cf8;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-item strong {
+            color: #4f46e5;
+        }
     </style>
 </head>
 <body>
-    <h1>AI 书签广告投放顾问</h1>
     <div class="container">
+        <header>
+            <h1>AI 投放顾问</h1>
+            <p>精准定位您的书签广告目标受众</p>
+        </header>
+        
         <form id="advisor-form">
-            <label for="books-info">1. 输入书籍信息 (每行一本书，格式：书名: 简介)</label>
-            <textarea id="books-info" placeholder="例如：
+            <div class="form-group">
+                <label for="books-info">1. 输入书籍信息 (每行一本书，格式：书名: 简介)</label>
+                <textarea id="books-info" placeholder="例如：
 三体: 一部关于外星文明入侵的硬科幻小说。
-活着: 讲述了一个人在中国历史变迁中经历苦难的故事。
-明朝那些事儿: 用通俗易懂的语言讲述明朝历史。" required></textarea>
-
-            <label for="target-audience">2. 输入你的书签广告目标人群</label>
-            <input type="text" id="target-audience" placeholder="例如：喜欢科幻、思考宇宙未来的年轻科技从业者" required>
-
+活着: 讲述了一个人在中国历史变迁中经历苦难的故事。"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="target-audience">2. 输入您的书签广告目标人群</label>
+                <input type="text" id="target-audience" placeholder="例如：喜欢科幻、思考宇宙未来的年轻科技从业者">
+            </div>
             <button id="submit-button" type="submit">获取投放建议</button>
         </form>
-    </div>
-    
-    <div id="response-area">
-        <p>分析结果将显示在这里...</p>
+
+        <div id="response-area"></div>
     </div>
 
     <script>
@@ -50,14 +202,17 @@
             const booksInfo = booksInfoInput.value.trim();
             const targetAudience = targetAudienceInput.value.trim();
             
-            if (!booksInfo || !targetAudience) return;
+            if (!booksInfo || !targetAudience) {
+                alert('请填写所有必填项！');
+                return;
+            }
 
             submitButton.disabled = true;
             submitButton.textContent = '分析中...';
-            responseArea.innerHTML = '<p class="loading">AI 顾问正在分析书籍和目标人群，请稍候...</p>';
+            // 显示动态加载器
+            responseArea.innerHTML = '<div class="loader"></div>';
 
             try {
-                // 注意，我们调用的函数是 advisor
                 const response = await fetch('/.netlify/functions/advisor', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -65,16 +220,40 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `服务器错误: ${response.status}`);
+                    const errorJson = await response.json();
+                    throw new Error(errorJson.error || `服务器返回了错误: ${response.status}`);
                 }
 
-                const data = await response.json();
-                responseArea.innerHTML = data.reply.replace(/\n/g, '<br>'); // 将换行符转为HTML换行
+                const recommendations = await response.json();
+                
+                // 清空加载器，准备显示结果
+                responseArea.innerHTML = '';
+
+                if (recommendations.length === 0) {
+                    responseArea.innerHTML = '<p style="text-align:center;">分析完成，没有找到高度匹配的书籍。</p>';
+                } else {
+                    const resultList = document.createElement('ul');
+                    resultList.id = 'result-list';
+                    
+                    recommendations.forEach((rec, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'result-item';
+                        // 使用 animation-delay 实现逐条飞入效果
+                        listItem.style.animationDelay = `${index * 0.15}s`;
+                        
+                        listItem.innerHTML = `
+                            <p><strong>书名:</strong> ${rec.book_name}</p>
+                            <p><strong>匹配度:</strong> ${rec.match_score}</p>
+                            <p><strong>推荐理由:</strong> ${rec.reason}</p>
+                        `;
+                        resultList.appendChild(listItem);
+                    });
+                    responseArea.appendChild(resultList);
+                }
 
             } catch (error) {
                 console.error('Error:', error);
-                responseArea.innerHTML = `<p style="color:red;"><strong>分析失败：</strong>${error.message}</p>`;
+                responseArea.innerHTML = `<p style="color:red; text-align:center;"><strong>分析失败：</strong>${error.message}</p>`;
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = '获取投放建议';
